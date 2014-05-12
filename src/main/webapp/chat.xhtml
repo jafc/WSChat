@@ -16,38 +16,80 @@ and open the template in the editor.
     </h:head>
     <h:body>
         <h:form id="formChat">
-            <p:panel header="Chat Publico">
-                <p:scrollPanel id="spScroll"
-                               style="height: 400px; width: 600px;">
-                    <p:dataGrid id="dtChatMessages" columns="1"
-                                 value="#{chatView.messages}"
-                                 var="msg"
-                                 emptyMessage="Sin mensajes nuevos"
-                                 style="border:none">
-                        <p:outputPanel>
-                        <h:panelGrid columns="2">
-                            <h:outputText value="#{msg.user} :" />
-                            <h:outputText value="#{msg.message}" />
-                        </h:panelGrid>
-                        </p:outputPanel>
-                    </p:dataGrid>
-                </p:scrollPanel>
 
-                <f:facet name="footer">
-                    <h:panelGrid columns="3">
-                        <p:inputText id="iptMessage" 
-                                     size="50"
-                                     binding="#{chatView.txtMessage}"/>
-                        <p:commandButton value="Enviar"
-                                         actionListener="#{chatView.sendMessage()}"
-                                         update="dtChatMessages" />
+            <p:growl showDetail="true" autoUpdate="true" />
+
+            <p:outputPanel id="oppLogin">
+                <p:panel id="panelLogin" header="Login"
+                         rendered="#{!chatView.isLogged()}">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Username:" />
+                        <p:inputText id="iptLogin"
+                                     value="#{chatView.loginName}"/>
+
+                        <h:outputText value="Password:" />
+                        <p:password id="iptPassword"/>
+
+                        <h:panelGrid />
+                        <p:commandButton value="Login"
+                                         action="#{chatView.login()}"
+                                         update="oppLogin,oppChat"/>
                     </h:panelGrid>
-                </f:facet>
-            </p:panel>
+                    <p:effect type="slide" event="load" />
+                </p:panel>
+            </p:outputPanel>
+
+
+            <p:outputPanel id="oppChat" deferred="true">
+                <p:panel id="panelChat" toggleable="true"
+                         header="Chat Publico"
+                         rendered="#{chatView.isLogged()}">
+                    <p:scrollPanel id="spScroll"
+                                   style="height: 400px; width: 600px;">
+                        <p:dataGrid id="dtChatMessages" columns="1"
+                                    value="#{chatView.messages}"
+                                    var="msg"
+                                    emptyMessage="Sin mensajes nuevos"
+                                    style="border:none">
+                            <p:outputPanel>
+                                <h:panelGrid columns="2">
+                                    <h:outputText value="#{msg.user} :" />
+                                    <h:outputText value="#{msg.message}"
+                                                  style="font-size: 13px"/>
+                                </h:panelGrid>
+                            </p:outputPanel>
+                        </p:dataGrid>
+                    </p:scrollPanel>
+
+                    <f:facet name="footer">
+                        <h:panelGroup id="pgInputMessage" layout="block">
+                            <h:panelGrid columns="3">
+                                <p:inputText id="iptMessage" 
+                                             size="50"
+                                             binding="#{chatView.txtMessage}"/>
+                                <p:commandButton value="Enviar"
+                                                 actionListener="#{chatView.sendMessage()}"
+                                                 update="dtChatMessages,spScroll,pgInputMessage"
+                                                 oncomplete="bajarScroll()"/>
+                                <p:commandButton value="Logout"
+                                                 action="#{chatView.logout()}"
+                                                 update="oppChat,oppLogin"
+                                                 oncomplete="onSocketClose();"/>
+                            </h:panelGrid>
+                            <p:focus for="iptMessage" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <p:effect type="slide" event="load" >
+                        <f:param name="direction" value="'up'" />
+                    </p:effect>
+                </p:panel>
+            </p:outputPanel>
 
             <p:remoteCommand name="setMessageData"
                              action="#{chatView.setMessageData()}"
-                             global="false" />
+                             global="false"
+                             update="dtChatMessages,spScroll"
+                             oncomplete="bajarScroll();"/>
         </h:form>
     </h:body>
 </html>

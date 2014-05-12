@@ -33,10 +33,13 @@ public class ChatView implements Serializable {
     private String loginName;
     private String password;
     private InputText txtMessage;
+    private Boolean logged;
     
     private List<Message> messages;
     
     private final Gson gsonParser;
+    
+    private static final String LOGOUT_MESSAGE = "se ha desconectado";
     
     /**
      * Creates a new instance of ChatView
@@ -45,6 +48,7 @@ public class ChatView implements Serializable {
         System.out.println("new ChatView");
         messages = new LinkedList<Message>();
         gsonParser = new Gson();
+        logged = false;
         //messages.add(new Message("test","test ..."));
     }
 
@@ -79,27 +83,35 @@ public class ChatView implements Serializable {
     public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
+
+    public Boolean isLogged() {
+        return logged;
+    }
+
+    public void setLogged(Boolean logged) {
+        this.logged = logged;
+    }
+    
     
     
     
     public String login() {
-        String message = loginName + " ha entrado al chat";
+        String message = "ha entrado al chat";
         Message msg = new Message(loginName, message);
-        messages.add(msg);
         System.out.println(message);
-        RequestContext.getCurrentInstance().execute("init();");
         String jsonMessage = gsonParser.toJson(msg);
-        //RequestContext.getCurrentInstance().execute("sendMessage('"+jsonMessage+"');");
-        return "chat";
+        RequestContext.getCurrentInstance().execute("init('"+jsonMessage+"');");
+        messages.add(msg);
+        logged = true;
+        return "";
     }
     
     public void sendMessage() {
         String strMessage = txtMessage.getValue().toString();
         Message msg = new Message(loginName, strMessage);
+        handleMessage(msg);
         messages.add(msg);
-        String jsonMessage = gsonParser.toJson(msg);
-        System.out.println("jsonMessage = "+jsonMessage);
-        RequestContext.getCurrentInstance().execute("sendMessage('"+jsonMessage+"');");
+        txtMessage.setValue("");
     }
     
     public String setMessageData() {
@@ -107,7 +119,22 @@ public class ChatView implements Serializable {
         Map map = ec.getRequestParameterMap();
         String msg = (String) map.get("msgdata");
         Message m = gsonParser.fromJson(msg, Message.class);
+        messages.add(m);
         System.out.println("m-loginName: "+m.getUser().toString());
         return null;
+    }
+    
+    public String logout() {
+        Message msg = new Message(loginName, LOGOUT_MESSAGE);
+        handleMessage(msg);
+        logged = false;
+        messages = new LinkedList<Message>();
+        return "";
+    }
+    
+    private void handleMessage(Message msg) {
+        String jsonMessage = gsonParser.toJson(msg);
+        System.out.println("jsonMessage = "+jsonMessage);
+        RequestContext.getCurrentInstance().execute("sendMessage('"+jsonMessage+"');");
     }
 }

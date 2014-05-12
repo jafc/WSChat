@@ -6,28 +6,47 @@
 
 var wsocket = null;
 
-function init() {
-    wsocket = new WebSocket("ws://localhost:8080/WSChat/wschat");
+function init(msgLogin) {
+    wsocket = new WebSocket("ws://localhost:8080/WSChat/wschat2");
     wsocket.onopen = function() {
-       wsocket.send("websocket connection established");
-      console.log("websocket connection established");
+        console.log(msgLogin);
+        wsocket.send(msgLogin);
+        console.log("websocket connection established");
     };
-    wsocket.onmessage = onSocketMessage;    
+    wsocket.onmessage = onSocketMessage;
+    wsocket.onclose = onSocketClose;
 }
 
 function onSocketMessage(event) {
-    console.log("onSocket message: "+event.data);
-    console.log("onSocket message: "+event.toString());
-    if(event.data) {
+    console.log("onSocket message: " + event.data);
+    console.log("onSocket message: " + event.toString());
+    if (event.data) {
         var data = event.data.toString();
-        console.log(data);
+        console.log("data = " + data);
         setMessageData([{name: 'msgdata', value: data}]);
     }
 }
 
 function sendMessage(message) {
-    console.log("Message2.. : "+message);
+    console.log("Message2.. : " + message);
 //    console.log(wsocket);
     wsocket.send(message);
-    console.log("Message dispached: "+message);
+    console.log("Message dispached: " + message);
+}
+
+function onSocketClose() {
+    wsocket.close();
+    console.log("websocket connection terminated.");
+}
+
+function bajarScroll() {
+    var scrollPanel = document.getElementById('formChat:spScroll');
+    if (scrollPanel !== null) {
+        scrollPanel.scrollTop = scrollPanel.scrollHeight;
+    }
+}
+
+function loginMessage(xhr, status, args) {
+    console.log("Login Message: " + args.jsonLogin);
+    console.log("Login Message: " + args.jsonMessage);
 }

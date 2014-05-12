@@ -32,7 +32,7 @@ import javax.websocket.server.ServerEndpoint;
  * @author Alexander Filigrana
  */
 @ServerEndpoint(
-        value = "/wschat")
+        value = "/wschat2")
 public class WSChatServer2 {
     
     private static final List<Message> messages = 
@@ -52,7 +52,10 @@ public class WSChatServer2 {
         messages.add(msg);
         for(Session openSession : sessions) {
             try {
-                openSession.getBasicRemote().sendObject(message);
+                if(openSession != session) {
+                    openSession.getBasicRemote().sendObject(message);
+                }
+                
             } catch (IOException ex) {
                 sessions.remove(openSession);
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
