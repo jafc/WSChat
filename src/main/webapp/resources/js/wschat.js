@@ -7,7 +7,7 @@
 var wsocket = null;
 
 function init(msgLogin) {
-    wsocket = new WebSocket("ws://192.168.2.139:8080/WSChat/wschat2");
+    wsocket = new WebSocket("ws://localhost:8080/WSChat/wschat2");
     wsocket.onopen = function() {
         console.log(msgLogin);
         wsocket.send(msgLogin);
