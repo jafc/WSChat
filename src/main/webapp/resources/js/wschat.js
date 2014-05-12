@@ -40,6 +40,7 @@ function onSocketClose() {
 }
 
 function bajarScroll() {
+    console.log("bajarScroll");
     var scrollPanel = document.getElementById('formChat:spScroll');
     if (scrollPanel !== null) {
         scrollPanel.scrollTop = scrollPanel.scrollHeight;
