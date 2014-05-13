@@ -5,9 +5,15 @@
  */
 
 var wsocket = null;
+var host = null;
+
+function setHost() {
+    host = document.getElementById('formChat:iptHost').value;
+    console.log("host: "+host);
+}
 
 function init(msgLogin) {
-    wsocket = new WebSocket("ws://localhost:8080/WSChat/wschat2");
+    wsocket = new WebSocket("ws://"+host+":8080/WSChat/wschat2");
     wsocket.onopen = function() {
         console.log(msgLogin);
         wsocket.send(msgLogin);

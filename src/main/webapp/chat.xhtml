@@ -23,6 +23,9 @@ and open the template in the editor.
                 <p:panel id="panelLogin" header="Login"
                          rendered="#{!chatView.isLogged()}">
                     <h:panelGrid columns="2">
+                        <h:outputText value="Host:" />
+                        <p:inputText id="iptHost" />
+                        
                         <h:outputText value="Username:" />
                         <p:inputText id="iptLogin"
                                      value="#{chatView.loginName}"/>
@@ -33,6 +36,7 @@ and open the template in the editor.
                         <h:panelGrid />
                         <p:commandButton value="Login"
                                          action="#{chatView.login()}"
+                                         onclick="setHost();"
                                          update="oppLogin,oppChat"/>
                     </h:panelGrid>
                     <p:effect type="slide" event="load" />
